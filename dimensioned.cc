@@ -20,7 +20,7 @@ int main(){
   dimensioned<float,Centimetre,1> shortside(90);
   dimensioned<float,Metre,1> longside(5);
   dimensioned<float,Centimetre,2> surface2 = shortside * longside;
-  cout << shortside << " x " << longside << " = " << surface2 << endl;
+  cout << shortside << " x " << longside << " = " << surface2 << " = " << dimensioned<float,Metre,2>(surface2) << endl;
 
   // converting the unit type works also for higher dimensions
   dimensioned<float,Metre,2> squareMetre(1000000);
