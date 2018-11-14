@@ -1,9 +1,12 @@
 compile=clang++ -Wall -Wfatal-errors -std=c++11
 
-all: basic si mpl_si
+all: basic dimensioned si mpl_si
 
 basic: basic_unittype.h basic.cc
 	$(compile) basic.cc -o basic
+
+dimensioned: dimensioned.h dimensioned.cc
+	$(compile) dimensioned.cc -o dimensioned
 
 si: si.h si.cc
 	$(compile) si.cc -o si
