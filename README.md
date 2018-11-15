@@ -124,3 +124,51 @@ Makefile:12: recipe for target 'mpl_si' failed
 make: *** [mpl_si] Error 1
 ```
 
+# Dimensioned
+
+In order to address the shortcomings of previous attempts regarding the UnitType (centimetres, miles
+etc.), I wrote dimensioned, which currently only looks at the length dimension, but unlike previous
+examples is also able to convert from one unit to another, so that metres and centimetres can be
+added together and multiplied.
+
+```
+dimensioned<float,Centimetre,1> shortside(90);
+dimensioned<float,Metre,1>      longside(5);
+dimensioned<float,Centimetre,2> surface = shortside * longside;
+dimensioned<float,Metre,2>      surface2 = shortside * longside;
+```
+
+As you would expect, cout'ing surface and surface2 yields `45000 cm2` and `4.5 m2` respectively. The
+UnitType template parameter must supply the functions below that allow printing and converting to
+and from metres. 
+```
+struct Metre {
+  template<typename ValueType>
+  static ValueType to_metres(ValueType in) {
+    return in;
+  }
+  template<typename ValueType>
+  static ValueType from_metres(ValueType in) {
+    return in;
+  }
+  static std::string print(){
+    return "m";
+  }
+};
+```
+
+To get the correct result when converting dimensions higher than 1, we must apply
+the conversion for each dimension, so that for example a volume of 1 m3 becomes
+100 * 100 * 100 cm3 = 1e6 cm3.
+
+```
+for(int i = 0; i < N; ++i){
+  m_value = UnitType::template from_metres<ValueType>(OtherUnit::template to_metres<ValueType>(m_value));
+}
+
+...
+
+dimensioned<float,Metre,3> mvolume(1) 
+cout << dimensioned<float,Centimetre,3>(mvolume) << endl;
+```
+

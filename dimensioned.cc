@@ -26,4 +26,12 @@ int main(){
   dimensioned<float,Metre,2> squareMetre(1000000);
   dimensioned<float,Kilometre,2> squareKms = squareMetre;
   cout << squareMetre << " = " << squareKms << endl;
+
+  cout << dimensioned<float,Centimetre,3>( dimensioned<float,Metre,3>(1) ) << endl;
+
+  cout << "-------------------------" << endl;
+
+  dimensioned<float,Kilometre,-2> postFrequencyIncreaseRate(123456);
+  dimensioned<float,Metre,-2> feetFreq = postFrequencyIncreaseRate;
+  cout << postFrequencyIncreaseRate << " = " << feetFreq << endl;
 }
