@@ -127,7 +127,7 @@ make: *** [mpl_si] Error 1
 # Dimensioned
 
 In order to address the shortcomings of previous attempts regarding the UnitType (centimetres, miles
-etc.), I wrote dimensioned, which currently only looks at the length dimension, but unlike previous
+etc.), I wrote dimensioned, which currently only looks at the length and time dimensions, but unlike previous
 examples is also able to convert from one unit to another, so that metres and centimetres can be
 added together and multiplied.
 
@@ -136,6 +136,13 @@ dimensioned<float,Centimetre,1> shortside(90);
 dimensioned<float,Metre,1>      longside(5);
 dimensioned<float,Centimetre,2> surface = shortside * longside;
 dimensioned<float,Metre,2>      surface2 = shortside * longside;
+
+dimensioned<float,Metre> d(5);
+dimensioned<float,Metre,0,Second,1> t(1);
+auto speed = d / t; // in metres per second
+dimensioned<float,Kilometre,1,Hour,-1> speed2(speed); // converted to kilometres per hour
+cout << "A distance of " << d << " is covered in " << t << " at a speed of " << speed 
+     << " = " << speed2 << endl;
 ```
 
 As you would expect, cout'ing surface and surface2 yields `45000 cm2` and `4.5 m2` respectively. The
@@ -171,4 +178,10 @@ for(int i = 0; i < N; ++i){
 dimensioned<float,Metre,3> mvolume(1) 
 cout << dimensioned<float,Centimetre,3>(mvolume) << endl;
 ```
+
+And similarly for negative dimensions, and for the time dimension as well. All of the approaches I
+have outlined share a problem in that dimensions cannot be defined later; each dimension has to be
+predefined and fixed, which makes it impossible to define later on that we want a number
+representing votes to be divided by time to get an object only compatible with other objects of the
+same "votes per second" type.
 
