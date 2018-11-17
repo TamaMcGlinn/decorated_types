@@ -9,15 +9,18 @@ int main(){
   cout << "------------Examples using distances---------------------" << endl;
   {
     // adding lengths of differing dimensions
-    distance<float> a(100);
+    distance<float> a = 100;
     distance<float,Centimetre> b(10);
     distance<float> c = a + b;
     cout << a << " + " << b << " = " << c << endl;
+    a += b;
+    cout << "/*same with +=*/ a += b; a = " << a << endl;
   }
 
   {
     // multiplying lengths yields a surface
-    distance<float> side1(3);
+    distance<float> halfside(3);
+    distance<float> side1 = halfside * 2;
     distance<float> side2(5);
     surface<float> surf = side1 * side2;
     cout << side1 << " x " << side2 << " = " << surf << endl;
@@ -86,17 +89,36 @@ int main(){
     // note that Minute here is nonsense since the time-dimension is 0, and this does not affect the result
     dimensioned<float,Metre,1,Minute,0> d1(50);
     time<float> t1(36);
-    cout << "A timespace surface of " << d1 << " by " << t1 << " is " << d1 * t1 
-         << " = " << dimensioned<float,Metre,1,Second,1>( d1 * t1 ) << endl;
+    auto timespaceSurface = d1 * t1;
+    dimensioned<float,Metre,1,Second,1> converted(timespaceSurface);
+    cout << "A timespace surface of " << d1 << " by " << t1 << " is " << timespaceSurface
+         << " = " << converted << endl;
+    time<float> t2 = 2;
+    cout << converted << " * " << t2 << " = " << converted * t2 << endl;
     auto speed = d1 / t1;
     cout << "A distance of " << d1 << " is covered in " << t1 << " at a speed of " << speed 
          << " = " << dimensioned<float,Kilometre,1,Hour,-1>(speed) << endl;
   }
+
+  {
+    dimensioned<float,Metre> d(5);
+    dimensioned<float,Metre,0,Second,1> t(1);
+    auto speed = d / t; // in metres per second
+    dimensioned<float,Kilometre,1,Hour,-1> speed2(speed); // converted to kilometres per hour
+    cout << "A distance of " << d << " is covered in " << t << " at a speed of " << speed 
+         << " = " << speed2 << endl;
+  }
   
-  dimensioned<float,Metre> d(5);
-  dimensioned<float,Metre,0,Second,1> t(1);
-  auto speed = d / t; // in metres per second
-  dimensioned<float,Kilometre,1,Hour,-1> speed2(speed); // converted to kilometres per hour
-  cout << "A distance of " << d << " is covered in " << t << " at a speed of " << speed 
-       << " = " << speed2 << endl;
+  {
+    distance<float> d1(5);
+    distance<float> d2(1);
+    float ratio = d1 / d2;
+    cout << d1 << " / " << d2 << " = " << ratio << endl;
+    distance<int> i(50);
+    cout << "i = " << i << endl;
+    i *= d1 / d2;
+    cout << "i *= " << d1 << " / " << d2 << endl;
+    cout << "i = " << i << endl;
+    //i *= d1; // correctly does not compile, i * d1 has different type than i
+  }
 }

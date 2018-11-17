@@ -9,11 +9,20 @@ namespace dimensional {
   struct dimensioned
   {
     typedef dimensioned<ValueType,DistanceUnit,DistanceDimension,TimeUnit,TimeDimension> SelfType;
+    
+    // the following shorthand refers to dimensioned with only the same valuetype
+    template<typename distU, int distD, typename timeU, int timeD>
+    using dim = dimensioned<ValueType, distU, distD, timeU, timeD>;
 
-    explicit dimensioned(ValueType v) : m_value(v) {}
+    //implicit conversion from ValueType
+    dimensioned(ValueType v) : m_value(v) {}
+    
+    //implicit conversion to   ValueType - preferably this 
+    //should only be possible if all dimensions are 0
+    operator ValueType(){ return m_value; }
 
     template<typename OtherDistanceUnit, typename OtherTimeUnit>
-    dimensioned(const dimensioned<ValueType,OtherDistanceUnit,DistanceDimension,OtherTimeUnit,TimeDimension> & rhs) {
+    dimensioned(const dim<OtherDistanceUnit,DistanceDimension,OtherTimeUnit,TimeDimension> & rhs) {
       m_value = rhs.value();
       for(int i = 0; i < DistanceDimension; ++i){
         m_value = DistanceUnit::template from_metres<ValueType>(OtherDistanceUnit::template to_metres<ValueType>(m_value));
@@ -42,45 +51,73 @@ namespace dimensional {
       }
     }
 
-    SelfType operator+ (const SelfType & rhs) {
+    SelfType operator+ (const SelfType & rhs) const {
       return SelfType(m_value + rhs.m_value);
     }
 
-    SelfType operator- (const SelfType & rhs) {
+    SelfType operator- (const SelfType & rhs) const {
       return SelfType(m_value - rhs.m_value);
     }
 
-    template<int OtherDistanceDimension>
-    dimensioned<ValueType,DistanceUnit,DistanceDimension+OtherDistanceDimension,TimeUnit,TimeDimension> operator* (
-        const dimensioned<ValueType,DistanceUnit,OtherDistanceDimension,TimeUnit,TimeDimension> & rhs) {
-      return dimensioned<ValueType,DistanceUnit,DistanceDimension+OtherDistanceDimension,TimeUnit,TimeDimension>(m_value * rhs.value());
+    void operator+= (const SelfType & rhs) {
+      m_value += rhs.m_value;
+    }
+
+    void operator-= (const SelfType & rhs) {
+      m_value -= rhs.m_value;
+    }
+
+    template<typename ScalarType>
+    SelfType operator* (const ScalarType & rhs) const {
+      return SelfType(m_value * rhs);
+    }
+
+    template<typename ScalarType>
+    void operator*= (const ScalarType & rhs) {
+      m_value *= rhs;
+    }
+
+    template<typename AnyValueType, typename AnyDistanceUnit, typename AnyTimeUnit>
+    void operator*= (const dimensioned<AnyValueType,AnyDistanceUnit,0,AnyTimeUnit,0> & rhs) {
+      m_value *= rhs.value();
     }
 
     template<typename OtherDistanceUnit, int OtherDistanceDimension, typename OtherTimeUnit, int OtherTimeDimension>
-    dimensioned<ValueType,DistanceUnit,DistanceDimension+OtherDistanceDimension,TimeUnit,TimeDimension+OtherTimeDimension> operator* (
-        const dimensioned<ValueType,OtherDistanceUnit,OtherDistanceDimension,OtherTimeUnit,OtherTimeDimension> & rhs) {
-      const dimensioned<ValueType,DistanceUnit,OtherDistanceDimension,TimeUnit,OtherTimeDimension> unitsConverted = rhs;
-      return dimensioned<ValueType,DistanceUnit,DistanceDimension+OtherDistanceDimension,TimeUnit,TimeDimension+OtherTimeDimension>(
-          m_value * unitsConverted.value());
+    dim<DistanceUnit,DistanceDimension+OtherDistanceDimension,TimeUnit,TimeDimension+OtherTimeDimension> operator* (
+        const dim<OtherDistanceUnit,OtherDistanceDimension,OtherTimeUnit,OtherTimeDimension> & rhs) const {
+      const dim<DistanceUnit,OtherDistanceDimension,TimeUnit,OtherTimeDimension> & unitsConverted = rhs;
+      return dim<DistanceUnit,DistanceDimension+OtherDistanceDimension,TimeUnit,TimeDimension+OtherTimeDimension>(
+          m_value * unitsConverted.value()
+      );
     }
 
-    template<int OtherDistanceDimension>
-    dimensioned<ValueType,DistanceUnit,DistanceDimension-OtherDistanceDimension,TimeUnit,TimeDimension> operator/ (
-        const dimensioned<ValueType,DistanceUnit,OtherDistanceDimension,TimeUnit,TimeDimension> & rhs) {
-      return dimensioned<ValueType,DistanceUnit,DistanceDimension-OtherDistanceDimension,TimeUnit,TimeDimension>(m_value / rhs.value());
+    template<typename ScalarType>
+    SelfType operator/ (const ScalarType & rhs) const {
+      return SelfType(m_value / rhs);
+    }
+
+    template<typename ScalarType>
+    void operator/= (const ScalarType & rhs) {
+      m_value /= rhs;
+    }
+
+    template<typename AnyValueType, typename AnyDistanceUnit, typename AnyTimeUnit>
+    void operator/= (const dimensioned<AnyValueType,AnyDistanceUnit,0,AnyTimeUnit,0> & rhs) {
+      m_value /= rhs.value();
     }
 
     template<typename OtherDistanceUnit, int OtherDistanceDimension, typename OtherTimeUnit, int OtherTimeDimension>
-    dimensioned<ValueType,DistanceUnit,DistanceDimension-OtherDistanceDimension,TimeUnit,TimeDimension-OtherTimeDimension> operator/ (
-        const dimensioned<ValueType,OtherDistanceUnit,OtherDistanceDimension,OtherTimeUnit,OtherTimeDimension> & rhs) {
-      const dimensioned<ValueType,DistanceUnit,OtherDistanceDimension,TimeUnit,OtherTimeDimension> unitsConverted = rhs;
-      return dimensioned<ValueType,DistanceUnit,DistanceDimension-OtherDistanceDimension,TimeUnit,TimeDimension-OtherTimeDimension>(
-          m_value / unitsConverted.value());
+    dim<DistanceUnit,DistanceDimension-OtherDistanceDimension,TimeUnit,TimeDimension-OtherTimeDimension> operator/ (
+        const dim<OtherDistanceUnit,OtherDistanceDimension,OtherTimeUnit,OtherTimeDimension> & rhs) const {
+      const dim<DistanceUnit,OtherDistanceDimension,TimeUnit,OtherTimeDimension> & unitsConverted = rhs;
+      return dim<DistanceUnit,DistanceDimension-OtherDistanceDimension,TimeUnit,TimeDimension-OtherTimeDimension>(
+          m_value / unitsConverted.value()
+      );
     }
 
   private:
     template<int dimension, typename Unit>
-    static std::string GetDimensionalSuffix(){
+    static std::string GetDimensionalSuffix() {
       if (dimension == 0){
         return "";
       } else {
@@ -107,5 +144,4 @@ namespace dimensional {
 
   #include "distance_shorthands.h"
   #include "time_shorthands.h"
-
 };
