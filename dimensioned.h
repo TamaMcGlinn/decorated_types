@@ -17,9 +17,17 @@ namespace dimensional {
     //implicit conversion from ValueType
     dimensioned(ValueType v) : m_value(v) {}
     
+    //implicit conversion from anything convertible to ValueType
+    template<typename ConvertSource>
+    dimensioned(ConvertSource v) : m_value(v) {}
+
     //implicit conversion to   ValueType - preferably this 
     //should only be possible if all dimensions are 0
     operator ValueType(){ return m_value; }
+
+    bool operator==(const SelfType & rhs){
+      return m_value == rhs.value();
+    }
 
     template<typename OtherDistanceUnit, typename OtherTimeUnit>
     dimensioned(const dim<OtherDistanceUnit,DistanceDimension,OtherTimeUnit,TimeDimension> & rhs) {
