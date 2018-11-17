@@ -5,6 +5,8 @@ using namespace dimensional;
 using std::cout;
 using std::endl;
 
+#include <gmpxx.h>
+
 int main(){
   cout << "------------Examples using distances---------------------" << endl;
   {
@@ -120,5 +122,14 @@ int main(){
     cout << "i *= " << d1 << " / " << d2 << endl;
     cout << "i = " << i << endl;
     //i *= d1; // correctly does not compile, i * d1 has different type than i
+  }
+
+  {
+    //typedef float numbertype;
+    typedef mpq_class numbertype;
+    distance<numbertype> a = 123456;
+    distance<numbertype> b = 0.002;
+    auto c = a + b;
+    cout << a << " + " << b << " == " << c << " : " << (a == c ? "true due to inaccuraccy" : "false, as expected") << endl;
   }
 }

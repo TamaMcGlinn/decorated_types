@@ -1,4 +1,4 @@
-compile=clang++ -Wall -Wfatal-errors -std=c++11
+compile=clang++ -Wall -Wfatal-errors -std=c++1y -I ~/code/boost_1_64_0 -o numerals -lgmpxx -lgmp
 
 targets=basic metre dimensioned si mpl_si
 
