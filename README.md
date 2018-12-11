@@ -41,7 +41,7 @@ types, but it should be possible to use `*=` on integer apples with a plain, una
   }
 ```
 
-# SI - internal standard units for physics calculations
+# SI - international standard units for physics calculations
 
 ```
 si.h and si.cc
@@ -53,7 +53,7 @@ multiplying two lengths should be a surface area.
 
 Again, the defined type accepts a type template parameter which is the underlying type for the calculations,
 but now we add a number of non-type, integer template parameters to the unit class template representing the
-dimensions desired. The first 3 integer represent Length, Mass and Time in that order, so for
+dimensions desired. The first 3 integers represent Length, Mass and Time in that order, so for
 example:
 
 ```
@@ -149,17 +149,17 @@ As you would expect, cout'ing surface and surface2 yields `45000 cm2` and `4.5 m
 UnitType template parameter must supply the functions below that allow printing and converting to
 and from metres. 
 ```
-struct Metre {
+struct Centimetre {
   template<typename ValueType>
   static ValueType to_metres(ValueType in) {
-    return in;
+    return in / 100.0;
   }
   template<typename ValueType>
   static ValueType from_metres(ValueType in) {
-    return in;
+    return in * 100.0;
   }
   static std::string print(){
-    return "m";
+    return "cm";
   }
 };
 ```
